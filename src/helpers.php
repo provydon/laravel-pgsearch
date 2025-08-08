@@ -3,10 +3,12 @@
 if (! function_exists('pg_search')) {
     function pg_search($query, $search, $columns, $options = [])
     {
-        if (! $search || trim($search) === '') {
+        $trimmedSearch = trim((string) $search);
+
+        if ($trimmedSearch === '') {
             return $query;
         }
 
-        return $query->pgSearch($search, $columns, $options);
+        return $query->pgSearch($trimmedSearch, $columns, $options);
     }
 }

@@ -40,12 +40,14 @@ class PgSearchTest extends TestCase
             ['id' => 1, 'name' => 'Jane-Doe', 'email' => 'jane@example.com', 'phone' => '123-456-7890'],
             ['id' => 2, 'name' => 'John Doe', 'email' => 'john@example.com', 'phone' => '987.654.3210'],
             ['id' => 3, 'name' => 'Bob Smith', 'email' => 'bob@test.com', 'phone' => '555-999-8888'],
+            ['id' => 4, 'name' => 'Oak-Li', 'email' => 'oak@example.com', 'phone' => '111-222-3333'],
         ]);
 
         Post::query()->insert([
             ['title' => 'Laravel Tips', 'content' => 'Great framework', 'user_id' => 1],
             ['title' => 'PHP Best Practices', 'content' => 'Clean code matters', 'user_id' => 2],
             ['title' => 'Database Design', 'content' => 'Normalization is key', 'user_id' => 3],
+            ['title' => 'Oak Development', 'content' => 'Building amazing apps', 'user_id' => 4],
         ]);
     }
 
@@ -61,16 +63,17 @@ class PgSearchTest extends TestCase
     public function it_searches_multiple_columns()
     {
         $results = User::query()->pgSearch('example', ['name', 'email'])->get();
-        $this->assertCount(2, $results);
+        $this->assertCount(3, $results);
         $this->assertTrue($results->pluck('email')->contains('jane@example.com'));
         $this->assertTrue($results->pluck('email')->contains('john@example.com'));
+        $this->assertTrue($results->pluck('email')->contains('oak@example.com'));
     }
 
     /** @test */
     public function it_normalizes_phone_numbers()
     {
         $users = User::all();
-        $this->assertCount(3, $users);
+        $this->assertCount(4, $users);
 
         $jane = User::query()->where('name', 'Jane-Doe')->first();
         $this->assertEquals('123-456-7890', $jane->phone);
@@ -112,15 +115,42 @@ class PgSearchTest extends TestCase
     public function it_returns_all_results_for_empty_search()
     {
         $results = User::query()->pgSearch('', ['name'])->get();
-        $this->assertCount(3, $results);
+        $this->assertCount(4, $results);
 
         $results = User::query()->pgSearch(null, ['name'])->get();
-        $this->assertCount(3, $results);
+        $this->assertCount(4, $results);
     }
 
     /** @test */
     public function it_handles_case_insensitive_search()
     {
+        // Test Oak-Li with various case combinations
+        $results = User::query()->pgSearch('OAK-LI', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        $results = User::query()->pgSearch('oak-li', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        $results = User::query()->pgSearch('Oak-Li', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        $results = User::query()->pgSearch('oAk-Li', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        // Test partial matches with case insensitivity
+        $results = User::query()->pgSearch('OAK', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        $results = User::query()->pgSearch('oak', ['name'])->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals('Oak-Li', $results->first()->name);
+
+        // Test other users for completeness
         $results = User::query()->pgSearch('JANE', ['name'])->get();
         $this->assertCount(1, $results);
         $this->assertEquals('Jane-Doe', $results->first()->name);

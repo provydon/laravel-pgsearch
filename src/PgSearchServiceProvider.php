@@ -21,7 +21,7 @@ class PgSearchServiceProvider extends ServiceProvider
         ], 'pgsearch-config');
 
         $this->registerMacro();
-        
+
         // Load helpers
         require_once __DIR__.'/helpers.php';
     }
@@ -34,9 +34,9 @@ class PgSearchServiceProvider extends ServiceProvider
 
         Builder::macro('pgSearch', function (?string $term, array $columns, array $options = []) {
             /** @var \Illuminate\Database\Eloquent\Builder $this */
-            $term = trim((string) $term);
+            $trimmedSearch = trim((string) $term);
 
-            if ($term === '' || empty($columns)) {
+            if ($trimmedSearch === '' || empty($columns)) {
                 return $this;
             }
 
@@ -52,22 +52,22 @@ class PgSearchServiceProvider extends ServiceProvider
             $model = $this->getModel();
 
             $normalized = $normalize
-                ? preg_replace('/[^a-zA-Z0-9]/', '', $term)
-                : $term;
+                ? preg_replace('/[^a-zA-Z0-9]/', '', $trimmedSearch)
+                : $trimmedSearch;
 
-            return $this->where(function ($q) use ($columns, $term, $normalized, $grammar, $model, $normalize) {
+            return $this->where(function ($q) use ($columns, $trimmedSearch, $normalized, $grammar, $model, $normalize) {
                 foreach ($columns as $col) {
                     if (str_contains($col, '.')) {
                         // relation.column
                         [$relation, $relatedCol] = explode('.', $col, 2);
 
-                        $q->orWhereHas($relation, function ($sub) use ($relatedCol, $term, $normalized, $grammar, $normalize) {
+                        $q->orWhereHas($relation, function ($sub) use ($relatedCol, $trimmedSearch, $normalized, $grammar, $normalize) {
                             /** @var \Illuminate\Database\Eloquent\Builder $sub */
                             $relatedModel = $sub->getModel();
                             $qualified = $relatedModel->qualifyColumn($relatedCol); // table.column
                             $wrapped = $grammar->wrap($qualified);
 
-                            $sub->whereRaw("CAST($wrapped AS TEXT) ILIKE ?", ['%'.$term.'%']);
+                            $sub->whereRaw("CAST($wrapped AS TEXT) ILIKE ?", ['%'.$trimmedSearch.'%']);
 
                             if ($normalize) {
                                 $sub->orWhereRaw("REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ['%'.$normalized.'%']);
@@ -77,7 +77,7 @@ class PgSearchServiceProvider extends ServiceProvider
                         $qualified = $model->qualifyColumn($col);
                         $wrapped = $grammar->wrap($qualified);
 
-                        $q->orWhereRaw("CAST($wrapped AS TEXT) ILIKE ?", ['%'.$term.'%']);
+                        $q->orWhereRaw("CAST($wrapped AS TEXT) ILIKE ?", ['%'.$trimmedSearch.'%']);
 
                         if ($normalize) {
                             $q->orWhereRaw("REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ['%'.$normalized.'%']);
