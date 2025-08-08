@@ -1,86 +1,118 @@
-# Laravel PostgreSQL Search
+# 🔍 Laravel PostgreSQL Search
 
-A Laravel package that provides PostgreSQL-friendly search functionality for Eloquent models using ILIKE queries with text normalization.
+**Smart PostgreSQL search for Laravel with text normalization and relationship support.**
 
-## Features
+[![Latest Version](https://img.shields.io/packagist/v/provydon/laravel-pgsearch)](https://packagist.org/packages/provydon/laravel-pgsearch)
+[![PHP Version](https://img.shields.io/packagist/php-v/provydon/laravel-pgsearch)](https://packagist.org/packages/provydon/laravel-pgsearch)
+[![Laravel Version](https://img.shields.io/badge/Laravel-10%2B-red)](https://laravel.com)
+[![License](https://img.shields.io/packagist/l/provydon/laravel-pgsearch)](LICENSE)
 
-- Case-insensitive search using PostgreSQL's ILIKE
-- Text normalization (removes punctuation for better matching)
-- Support for searching across model relationships
-- Automatic fallback for non-PostgreSQL databases
-- Configurable search options
+## ✨ Why This Package?
 
-## Installation
+- 🎯 **Smart matching**: Find "Jane Doe" even when stored as "Jane-Doe"
+- 📱 **Phone numbers**: Search "1234567890" matches "(123) 456-7890"
+- 🔗 **Relationships**: Search across related models seamlessly
+- ⚡ **PostgreSQL optimized**: Uses ILIKE and REGEXP_REPLACE for performance
+- 🛡️ **Safe fallback**: Works on non-PostgreSQL databases (no-op)
 
-Install the package via Composer:
+## 🚀 Quick Start
 
+### Install
 ```bash
-composer require provydon/laravel-pg-search
+composer require provydon/laravel-pgsearch
 ```
 
-The service provider will be automatically registered via Laravel's package discovery.
+### Use Immediately
+```php
+// Search users
+User::query()->pgSearch('john doe', ['name', 'email'])->get();
 
-## Configuration
+// Search with relationships  
+Post::query()->pgSearch('jane', ['title', 'user.name'])->get();
 
-Publish the configuration file:
+// Phone number search
+User::query()->pgSearch('1234567890', ['phone'])->get();
+```
+
+That's it! No configuration needed.
+
+## 📖 Usage Examples
+
+### Basic Search
+```php
+// Single column
+User::query()->pgSearch('john', ['name'])->get();
+
+// Multiple columns
+User::query()->pgSearch('example', ['name', 'email'])->get();
+```
+
+### Relationship Search
+```php
+// Search posts by author name
+Post::query()->pgSearch('jane doe', ['title', 'user.name'])->get();
+
+// Search orders by customer info
+Order::query()->pgSearch('smith', ['number', 'customer.name', 'customer.email'])->get();
+```
+
+### Advanced Options
+```php
+// Disable text normalization
+User::query()->pgSearch('exact-match', ['name'], ['normalize' => false])->get();
+
+// Chain with other query methods
+User::query()
+    ->where('active', true)
+    ->pgSearch('john', ['name'])
+    ->orderBy('created_at')
+    ->paginate(15);
+```
+
+## 🔧 Configuration (Optional)
+
+Publish config to customize behavior:
 
 ```bash
 php artisan vendor:publish --tag=pgsearch-config
 ```
 
-This will create `config/pgsearch.php` with the following options:
-
 ```php
+// config/pgsearch.php
 return [
-    'normalize' => true, // Enable text normalization
+    'normalize' => true, // Enable smart text matching
 ];
 ```
 
-## Usage
+## 🧠 How It Works
 
-The package adds a `pgSearch` macro to Eloquent's query builder:
+The package performs intelligent PostgreSQL searches:
+
+| Search Type | SQL Example | Matches |
+|-------------|-------------|---------|
+| **Direct** | `name ILIKE '%john doe%'` | "John Doe", "JOHN DOE" |
+| **Normalized** | `REGEXP_REPLACE(phone, '[^a-zA-Z0-9]', '', 'g') ILIKE '%1234567890%'` | "(123) 456-7890", "123-456-7890" |
+
+### Real-World Examples
 
 ```php
-use App\Models\User;
+// These all find the same user:
+User::query()->pgSearch('Jane Doe', ['name'])->get();      // Direct match
+User::query()->pgSearch('jane doe', ['name'])->get();      // Case insensitive  
+User::query()->pgSearch('janedoe', ['name'])->get();       // Normalized match
 
-// Search users by name
-$users = User::query()
-    ->pgSearch('john doe', ['name'])
-    ->get();
-
-// Search across multiple columns
-$users = User::query()
-    ->pgSearch('example', ['name', 'email'])
-    ->get();
-
-// Search with relationships
-$posts = Post::query()
-    ->pgSearch('jane', ['title', 'user.name'])
-    ->get();
-
-// Disable normalization for specific search
-$users = User::query()
-    ->pgSearch('exact-match', ['name'], ['normalize' => false])
-    ->get();
+// Phone number variations:
+User::query()->pgSearch('1234567890', ['phone'])->get();   // Finds all these:
+// "(123) 456-7890", "123-456-7890", "123.456.7890", "123 456 7890"
 ```
 
-## How It Works
+## 📋 Requirements
 
-The search performs two types of matching:
+- **Laravel**: 10.0+ or 11.0+
+- **PHP**: 8.1+
+- **Database**: PostgreSQL (graceful fallback for others)
 
-1. **Direct ILIKE match**: `CAST(column AS TEXT) ILIKE '%term%'`
-2. **Normalized match** (if enabled): Removes punctuation and searches again
-
-This allows matching "Jane Doe" with "Jane-Doe" or phone numbers like "123-456-7890" with "1234567890".
-
-## Database Requirements
-
-- PostgreSQL database
-- For non-PostgreSQL databases, the macro returns the query unchanged (no-op)
-
-## Testing
-
-The package includes PostgreSQL-specific tests. Make sure you have a PostgreSQL database set up:
+## 🧪 Testing
 
 ```bash
 # Create test database
@@ -90,26 +122,12 @@ createdb pg-search
 composer test
 ```
 
-Test configuration uses these environment variables:
-- `DB_CONNECTION=pgsql`
-- `DB_HOST=127.0.0.1`
-- `DB_PORT=5432`
-- `DB_DATABASE=pg-search`
-- `DB_USERNAME=`
-- `DB_PASSWORD=`
+## 📝 License
 
-## Code Formatting
+MIT License - see [LICENSE](LICENSE) for details.
 
-The project uses Laravel Pint for code formatting:
+---
 
-```bash
-# Format code
-composer format
-
-# Check formatting (without making changes)
-composer format-check
-```
-
-## License
-
-MIT License
+<p align="center">
+<strong>Made with ❤️ for the Laravel community</strong>
+</p>
