@@ -21,6 +21,9 @@ class PgSearchServiceProvider extends ServiceProvider
         ], 'pgsearch-config');
 
         $this->registerMacro();
+        
+        // Load helpers
+        require_once __DIR__.'/helpers.php';
     }
 
     protected function registerMacro(): void

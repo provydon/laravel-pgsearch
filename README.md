@@ -33,6 +33,9 @@ Post::query()->pgSearch('jane', ['title', 'user.name'])->get();
 
 // Phone number search
 User::query()->pgSearch('1234567890', ['phone'])->get();
+
+// Or use the helper function
+pg_search(User::query(), 'john doe', ['name', 'email'])->get();
 ```
 
 That's it! No configuration needed.
@@ -68,6 +71,29 @@ User::query()
     ->pgSearch('john', ['name'])
     ->orderBy('created_at')
     ->paginate(15);
+```
+
+### Helper Function
+For convenience, you can also use the `pg_search()` helper function:
+
+```php
+// Using the helper function
+$users = pg_search(User::query(), 'john doe', ['name', 'email'])->get();
+
+// With options
+$users = pg_search(User::query(), 'john', ['name'], ['normalize' => false])->get();
+
+// In controllers
+public function search(Request $request)
+{
+    $query = User::query()->where('active', true);
+    
+    if ($request->has('search')) {
+        $query = pg_search($query, $request->search, ['name', 'email']);
+    }
+    
+    return $query->paginate(15);
+}
 ```
 
 ## 🔧 Configuration (Optional)
