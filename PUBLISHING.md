@@ -18,7 +18,7 @@
 ## GitHub Repository Setup
 
 ### 1. Create Repository
-- **Name:** `laravel-pg-search`
+- **Name:** `laravel-pgsearch`
 - **Description:** `Laravel package for PostgreSQL full-text search with ILIKE queries and text normalization`
 - **Visibility:** Public
 - **License:** MIT
@@ -26,7 +26,7 @@
 ### 2. Repository Settings
 ```bash
 # Add remote origin
-git remote add origin https://github.com/YOUR_USERNAME/laravel-pg-search.git
+git remote add origin https://github.com/YOUR_USERNAME/laravel-pgsearch.git
 
 # Push to GitHub
 git add .
@@ -52,7 +52,7 @@ Go to your GitHub repo settings and add these topics:
 1. Go to [packagist.org](https://packagist.org)
 2. Sign in with GitHub
 3. Click "Submit" 
-4. Enter your repository URL: `https://github.com/YOUR_USERNAME/laravel-pg-search`
+4. Enter your repository URL: `https://github.com/YOUR_USERNAME/laravel-pgsearch`
 5. Click "Check" then "Submit"
 
 ### 2. Auto-Update Setup
@@ -82,7 +82,7 @@ git push origin v1.0.0
 ### 1. Installation Test
 ```bash
 # Test installation in a fresh Laravel project
-composer require provydon/laravel-pg-search
+composer require provydon/laravel-pgsearch
 ```
 
 ### 2. Documentation

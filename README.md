@@ -20,7 +20,7 @@
 
 ### Install
 ```bash
-composer require provydon/laravel-pg-search
+composer require provydon/laravel-pgsearch
 ```
 
 ### Use Immediately

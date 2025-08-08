@@ -1,5 +1,5 @@
 {
-    "name": "provydon/laravel-pg-search",
+    "name": "provydon/laravel-pgsearch",
     "description": "PostgreSQL-friendly search for Eloquent (ILIKE + normalization; optional FTS/trigram later).",
     "type": "library",
     "license": "MIT",
