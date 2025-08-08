@@ -2,10 +2,11 @@
 
 **Smart PostgreSQL search for Laravel with text normalization and relationship support.**
 
-[![Latest Version](https://img.shields.io/packagist/v/provydon/laravel-pgsearch)](https://packagist.org/packages/provydon/laravel-pgsearch)
-[![PHP Version](https://img.shields.io/packagist/php-v/provydon/laravel-pgsearch)](https://packagist.org/packages/provydon/laravel-pgsearch)
-[![Laravel Version](https://img.shields.io/badge/Laravel-10%2B-red)](https://laravel.com)
-[![License](https://img.shields.io/packagist/l/provydon/laravel-pgsearch)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue)](https://php.net)
+[![Laravel Version](https://img.shields.io/badge/Laravel-10%2B|11%2B-red)](https://laravel.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Compatible-336791)](https://postgresql.org)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)](tests)
 
 ## ✨ Why This Package?
 
@@ -19,7 +20,7 @@
 
 ### Install
 ```bash
-composer require provydon/laravel-pgsearch
+composer require provydon/laravel-pg-search
 ```
 
 ### Use Immediately
