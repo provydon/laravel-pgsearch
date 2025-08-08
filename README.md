@@ -3,7 +3,7 @@
 **Smart PostgreSQL search for Laravel with text normalization and relationship support.**
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue)](https://php.net)
-[![Laravel Version](https://img.shields.io/badge/Laravel-10%2B|11%2B-red)](https://laravel.com)
+[![Laravel Version](https://img.shields.io/badge/Laravel-10%2B|11%2B|12%2B-red)](https://laravel.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Compatible-336791)](https://postgresql.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)](tests)
@@ -109,7 +109,7 @@ User::query()->pgSearch('1234567890', ['phone'])->get();   // Finds all these:
 
 ## 📋 Requirements
 
-- **Laravel**: 10.0+ or 11.0+
+- **Laravel**: 10.0+, 11.0+, or 12.0+
 - **PHP**: 8.1+
 - **Database**: PostgreSQL (graceful fallback for others)
 
