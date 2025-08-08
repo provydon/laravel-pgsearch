@@ -8,6 +8,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)](tests)
 
+<a href="https://www.buymeacoffee.com/provydon" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 ## ✨ Why This Package?
 
 - 🎯 **Smart matching**: Find "Jane Doe" even when stored as "Jane-Doe"
@@ -122,6 +124,14 @@ createdb pg-search
 # Run tests
 composer test
 ```
+
+## 💖 Support
+
+If this package helped you, consider supporting its development:
+
+<a href="https://www.buymeacoffee.com/provydon" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
+</a>
 
 ## 📝 License
 
