@@ -33,8 +33,8 @@ class PgSearchServiceProvider extends ServiceProvider
             /** @var \Illuminate\Database\Eloquent\Builder $this */
             $term = trim((string) $term);
 
-            if ($term === '') {
-                return $this; // nothing to do
+            if ($term === '' || empty($columns)) {
+                return $this;
             }
 
             // Only act when using Postgres; otherwise no-op (or implement LIKE fallback if you want)

@@ -113,6 +113,22 @@ User::query()->pgSearch('1234567890', ['phone'])->get();   // Finds all these:
 - **PHP**: 8.1+
 - **Database**: PostgreSQL (graceful fallback for others)
 
+## ⚡ Performance Tips
+
+For frequently searched columns, add expression indexes to speed up normalized searches:
+
+```sql
+-- For phone number searches
+CREATE INDEX users_phone_normalized_idx 
+ON users (REGEXP_REPLACE(phone::text, '[^a-zA-Z0-9]', '', 'g'));
+
+-- For name searches  
+CREATE INDEX users_name_normalized_idx 
+ON users (REGEXP_REPLACE(name::text, '[^a-zA-Z0-9]', '', 'g'));
+```
+
+**Important**: Use the exact same expression as in the search query for optimal performance.
+
 ## 🧪 Testing
 
 ```bash
