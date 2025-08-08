@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="vendor/autoload.php">
+  <testsuites>
+    <testsuite name="Package">
+      <directory suffix="Test.php">./tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="DB_CONNECTION" value="pgsql"/>
+    <env name="DB_HOST" value="127.0.0.1"/>
+    <env name="DB_PORT" value="5432"/>
+    <env name="DB_DATABASE" value="pg-search"/>
+    <env name="DB_USERNAME" value=""/>
+    <env name="DB_PASSWORD" value=""/>
+  </php>
+</phpunit>

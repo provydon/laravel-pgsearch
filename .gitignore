@@ -1,0 +1,8 @@
+# .gitignore (root)
+vendor
+composer.lock
+.phpunit.result.cache
+.php-cs-fixer.cache
+.idea
+.phpstorm.meta.php
+.DS_Store
