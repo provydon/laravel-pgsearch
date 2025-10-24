@@ -40,6 +40,14 @@ pg_search(User::query(), 'john doe', ['name', 'email'])->get();
 
 That's it! No configuration needed.
 
+## 💖 Support
+
+If this package helped you, consider supporting its development:
+
+<a href="https://buymeacoffee.com/provydon" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
+</a>
+
 ## 📖 Usage Examples
 
 ### Basic Search
@@ -164,14 +172,6 @@ createdb pg-search
 # Run tests
 composer test
 ```
-
-## 💖 Support
-
-If this package helped you, consider supporting its development:
-
-<a href="https://buymeacoffee.com/provydon" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
-</a>
 
 ## 📝 License
 
