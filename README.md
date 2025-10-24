@@ -169,7 +169,7 @@ composer test
 
 If this package helped you, consider supporting its development:
 
-<a href="https://www.buymeacoffee.com/provydon" target="_blank">
+<a href="https://buymeacoffee.com/provydon" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
 </a>
 
