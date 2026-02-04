@@ -40,13 +40,14 @@ class PgSearchServiceProvider extends ServiceProvider
                 return $this;
             }
 
-            // Only act when using Postgres; otherwise no-op (or implement LIKE fallback if you want)
             if ($this->getConnection()->getDriverName() !== 'pgsql') {
                 return $this;
             }
 
             $opts = array_merge(config('pgsearch', []), $options);
             $normalize = (bool) ($opts['normalize'] ?? true);
+            $wordBasedMatching = (bool) ($opts['word_based_matching'] ?? true);
+            $ignoreSuffixes = $opts['ignore_suffixes'] ?? ['state', 'province', 'region', 'territory', 'city', 'town', 'municipality'];
 
             $grammar = $this->getQuery()->getGrammar();
             $model = $this->getModel();
@@ -55,13 +56,28 @@ class PgSearchServiceProvider extends ServiceProvider
                 ? preg_replace('/[^a-zA-Z0-9]/', '', $trimmedSearch)
                 : $trimmedSearch;
 
-            return $this->where(function ($q) use ($columns, $trimmedSearch, $normalized, $grammar, $model, $normalize) {
+            // Extract words for token-based matching
+            $words = preg_split('/\s+/', $trimmedSearch);
+            $normalizedWords = array_map(function ($word) {
+                return preg_replace('/[^a-zA-Z0-9]/', '', $word);
+            }, array_filter($words, function ($word) {
+                return strlen(trim($word)) > 0;
+            }));
+
+            // Filter out common suffixes if word-based matching is enabled
+            $searchWords = $wordBasedMatching
+                ? array_filter($normalizedWords, function ($word) use ($ignoreSuffixes) {
+                    return ! in_array(strtolower($word), $ignoreSuffixes) && strlen($word) > 2;
+                })
+                : [];
+
+            return $this->where(function ($q) use ($columns, $trimmedSearch, $normalized, $searchWords, $grammar, $model, $normalize, $wordBasedMatching) {
                 foreach ($columns as $col) {
                     if (str_contains($col, '.')) {
                         // relation.column
                         [$relation, $relatedCol] = explode('.', $col, 2);
 
-                        $q->orWhereHas($relation, function ($sub) use ($relatedCol, $trimmedSearch, $normalized, $grammar, $normalize) {
+                        $q->orWhereHas($relation, function ($sub) use ($relatedCol, $trimmedSearch, $normalized, $searchWords, $grammar, $normalize, $wordBasedMatching) {
                             /** @var \Illuminate\Database\Eloquent\Builder $sub */
                             $relatedModel = $sub->getModel();
                             $qualified = $relatedModel->qualifyColumn($relatedCol); // table.column
@@ -71,6 +87,16 @@ class PgSearchServiceProvider extends ServiceProvider
 
                             if ($normalize) {
                                 $sub->orWhereRaw("REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ['%'.$normalized.'%']);
+                                if ($wordBasedMatching && ! empty($searchWords)) {
+                                    $sub->orWhere(function ($wordQuery) use ($wrapped, $searchWords) {
+                                        foreach ($searchWords as $word) {
+                                            $wordQuery->orWhereRaw(
+                                                "REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?",
+                                                ['%'.$word.'%']
+                                            );
+                                        }
+                                    });
+                                }
                             }
                         });
                     } else {
@@ -81,6 +107,16 @@ class PgSearchServiceProvider extends ServiceProvider
 
                         if ($normalize) {
                             $q->orWhereRaw("REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ['%'.$normalized.'%']);
+                            if ($wordBasedMatching && ! empty($searchWords)) {
+                                $q->orWhere(function ($wordQuery) use ($wrapped, $searchWords) {
+                                    foreach ($searchWords as $word) {
+                                        $wordQuery->orWhereRaw(
+                                            "REGEXP_REPLACE(CAST($wrapped AS TEXT), '[^a-zA-Z0-9]', '', 'g') ILIKE ?",
+                                            ['%'.$word.'%']
+                                        );
+                                    }
+                                });
+                            }
                         }
                     }
                 }

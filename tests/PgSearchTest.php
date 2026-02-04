@@ -55,8 +55,11 @@ class PgSearchTest extends TestCase
     public function it_applies_ilike_and_normalized_search()
     {
         $results = User::query()->pgSearch('Jane Doe', ['name'])->get();
-        $this->assertCount(1, $results);
-        $this->assertEquals('Jane-Doe', $results->first()->name);
+        // With word-based matching enabled, both "Jane-Doe" (normalized full match)
+        // and "John Doe" (token "doe") are valid matches.
+        $this->assertCount(2, $results);
+        $this->assertTrue($results->pluck('name')->contains('Jane-Doe'));
+        $this->assertTrue($results->pluck('name')->contains('John Doe'));
     }
 
     /** @test */
@@ -179,6 +182,20 @@ class PgSearchTest extends TestCase
         $results = Post::query()->pgSearch('code', ['title', 'content'])->get();
         $this->assertCount(1, $results);
         $this->assertEquals('PHP Best Practices', $results->first()->title);
+    }
+
+    /** @test */
+    public function it_matches_longer_search_terms_against_shorter_db_values_via_tokens()
+    {
+        // Simulate geographic-style names
+        User::query()->insert([
+            ['id' => 5, 'name' => 'Lagos', 'email' => 'lagos@example.com', 'phone' => null],
+        ]);
+
+        // "Lagos State" should match "Lagos" because of the "lagos" token
+        $results = User::query()->pgSearch('Lagos State', ['name'])->get();
+
+        $this->assertTrue($results->pluck('name')->contains('Lagos'));
     }
 }
 

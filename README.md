@@ -115,7 +115,26 @@ php artisan vendor:publish --tag=pgsearch-config
 ```php
 // config/pgsearch.php
 return [
-    'normalize' => true, // Enable smart text matching
+    'normalize' => true, // Enable smart text matching (punctuation-stripped)
+
+    // NEW: Word-based matching (on normalized text)
+    // When enabled, the search term is split into tokens and each
+    // significant word is also searched individually. This lets
+    // "Lagos State" match a record that only contains "Lagos", etc.
+    'word_based_matching' => true,
+
+    // NEW: Common suffixes ignored as standalone tokens when doing
+    // word-based matching. Useful for geographic names:
+    // "Lagos State" → token "lagos" (since "state" is ignored).
+    'ignore_suffixes' => [
+        'state',
+        'province',
+        'region',
+        'territory',
+        'city',
+        'town',
+        'municipality',
+    ],
 ];
 ```
 
