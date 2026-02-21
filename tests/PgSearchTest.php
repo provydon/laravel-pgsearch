@@ -197,6 +197,29 @@ class PgSearchTest extends TestCase
 
         $this->assertTrue($results->pluck('name')->contains('Lagos'));
     }
+
+    /** @test */
+    public function it_orders_by_best_match_when_multiple_rows_match_generic_words()
+    {
+        // Simulate business locations: "office" matches many, but "Kwara State Office" should rank above "Abia State Office"
+        if (! Schema::hasTable('business_locations')) {
+            Schema::create('business_locations', function ($t) {
+                $t->id();
+                $t->string('name');
+            });
+        }
+        BusinessLocation::query()->delete();
+        BusinessLocation::query()->insert([
+            ['id' => 1, 'name' => 'Abia State Office'],
+            ['id' => 35, 'name' => 'Kwara State Office'],
+        ]);
+
+        $result = BusinessLocation::query()
+            ->pgSearch('KWARA STATE OFFICE', ['name'])
+            ->value('id');
+
+        $this->assertEquals(35, $result, 'Best match (Kwara) should be first, not Abia');
+    }
 }
 
 class User extends Model
@@ -225,4 +248,13 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+}
+
+class BusinessLocation extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    protected $table = 'business_locations';
 }

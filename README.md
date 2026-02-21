@@ -73,6 +73,9 @@ Order::query()->pgSearch('smith', ['number', 'customer.name', 'customer.email'])
 // Disable text normalization
 User::query()->pgSearch('exact-match', ['name'], ['normalize' => false])->get();
 
+// Disable best-match ordering (default: true)
+User::query()->pgSearch('office', ['name'], ['order_by_best_match' => false])->get();
+
 // Chain with other query methods
 User::query()
     ->where('active', true)
@@ -80,6 +83,22 @@ User::query()
     ->orderBy('created_at')
     ->paginate(15);
 ```
+
+### Ordering and Custom Sort
+
+When `order_by_best_match` is enabled (default), results are ranked by relevance: exact phrase match (100) > normalized match (50) > word token match (10). This prevents generic words (e.g. "office") from returning the wrong row when multiple rows match.
+
+**Custom ordering**: Chain your `orderBy` **after** `pgSearch()` so relevance is primary and your column is the tiebreaker:
+
+```php
+// ✓ Relevance first, then created_at
+User::query()->pgSearch('john', ['name'])->orderBy('created_at', 'desc')->get();
+
+// ✗ Your order wins; relevance only as tiebreaker
+User::query()->orderBy('created_at')->pgSearch('john', ['name'])->get();
+```
+
+To disable best-match ordering entirely, pass `['order_by_best_match' => false]` or set it in config.
 
 ### Helper Function
 For convenience, you can also use the `pg_search()` helper function:
@@ -117,7 +136,9 @@ php artisan vendor:publish --tag=pgsearch-config
 return [
     'normalize' => true, // Enable smart text matching (punctuation-stripped)
 
-    // NEW: Word-based matching (on normalized text)
+    'order_by_best_match' => true, // Order results by relevance (exact match > normalized > word matches)
+
+    // Word-based matching (on normalized text)
     // When enabled, the search term is split into tokens and each
     // significant word is also searched individually. This lets
     // "Lagos State" match a record that only contains "Lagos", etc.

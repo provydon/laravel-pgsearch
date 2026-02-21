@@ -4,6 +4,9 @@ return [
     // When true, also compare with punctuation stripped (helps phone numbers, IDs, etc.)
     'normalize' => true,
 
+    // Order by relevance (exact 100, normalized 50, word 10). Chain orderBy after pgSearch for custom sort.
+    'order_by_best_match' => true,
+
     // When true, split the search term into tokens (words) and
     // also search by each significant word individually. This helps
     // cases like searching for "Lagos State" when the DB only contains "Lagos".
