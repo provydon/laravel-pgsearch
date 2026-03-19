@@ -1,6 +1,6 @@
 {
     "name": "provydon/laravel-pgsearch",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "description": "PostgreSQL-friendly search for Eloquent (ILIKE + normalization; optional FTS/trigram later).",
     "type": "library",
     "license": "MIT",
@@ -16,14 +16,14 @@
     },
     "require": {
         "php": ">=8.1",
-        "illuminate/support": "^10.0|^11.0|^12.0",
-        "illuminate/database": "^10.0|^11.0|^12.0"
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.34",
-        "pestphp/pest-plugin-laravel": "^2.4",
-        "phpunit/phpunit": "^10.0|^11.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+        "pestphp/pest": "^2.34|^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^2.4|^3.0|^4.0",
+        "phpunit/phpunit": "^10.5.17|^11.5.50|^12.5.12|^13.0",
         "laravel/pint": "^1.24"
     },
     "extra": {
@@ -41,7 +41,7 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/pest",
+        "test": "vendor/bin/phpunit",
         "format": "vendor/bin/pint",
         "format-check": "vendor/bin/pint --test"
     }

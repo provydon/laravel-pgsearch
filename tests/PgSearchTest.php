@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 use Provydon\PgSearch\PgSearchServiceProvider;
 
 class PgSearchTest extends TestCase
@@ -51,7 +52,7 @@ class PgSearchTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_applies_ilike_and_normalized_search()
     {
         $results = User::query()->pgSearch('Jane Doe', ['name'])->get();
@@ -62,7 +63,7 @@ class PgSearchTest extends TestCase
         $this->assertTrue($results->pluck('name')->contains('John Doe'));
     }
 
-    /** @test */
+    #[Test]
     public function it_searches_multiple_columns()
     {
         $results = User::query()->pgSearch('example', ['name', 'email'])->get();
@@ -72,7 +73,7 @@ class PgSearchTest extends TestCase
         $this->assertTrue($results->pluck('email')->contains('oak@example.com'));
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_phone_numbers()
     {
         $users = User::all();
@@ -96,7 +97,7 @@ class PgSearchTest extends TestCase
         $this->assertEquals('John Doe', $resultsSpaced->first()->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_searches_with_relationships()
     {
         $results = Post::query()->pgSearch('Jane', ['title', 'user.name'])->get();
@@ -104,7 +105,7 @@ class PgSearchTest extends TestCase
         $this->assertEquals('Laravel Tips', $results->first()->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_disables_normalization_when_requested()
     {
         $results = User::query()->pgSearch('Jane-Doe', ['name'], ['normalize' => false])->get();
@@ -114,7 +115,7 @@ class PgSearchTest extends TestCase
         $this->assertCount(0, $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_all_results_for_empty_search()
     {
         $results = User::query()->pgSearch('', ['name'])->get();
@@ -124,7 +125,7 @@ class PgSearchTest extends TestCase
         $this->assertCount(4, $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_case_insensitive_search()
     {
         // Test Oak-Li with various case combinations
@@ -163,7 +164,7 @@ class PgSearchTest extends TestCase
         $this->assertEquals('John Doe', $results->first()->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_searches_partial_matches()
     {
         $results = User::query()->pgSearch('Doe', ['name'])->get();
@@ -172,7 +173,7 @@ class PgSearchTest extends TestCase
         $this->assertTrue($results->pluck('name')->contains('John Doe'));
     }
 
-    /** @test */
+    #[Test]
     public function it_searches_across_text_content()
     {
         $results = Post::query()->pgSearch('framework', ['content'])->get();
@@ -184,7 +185,7 @@ class PgSearchTest extends TestCase
         $this->assertEquals('PHP Best Practices', $results->first()->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_matches_longer_search_terms_against_shorter_db_values_via_tokens()
     {
         // Simulate geographic-style names
@@ -198,7 +199,7 @@ class PgSearchTest extends TestCase
         $this->assertTrue($results->pluck('name')->contains('Lagos'));
     }
 
-    /** @test */
+    #[Test]
     public function it_orders_by_best_match_when_multiple_rows_match_generic_words()
     {
         // Simulate business locations: "office" matches many, but "Kwara State Office" should rank above "Abia State Office"
